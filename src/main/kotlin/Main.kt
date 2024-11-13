@@ -5,7 +5,17 @@ import java.io.File
 fun main() {
     val wordsFile: File = File("words.txt")
 
-    for (line in wordsFile.readLines()) {
-        println(line)
+    val dictionary: MutableList<Word> = mutableListOf()
+
+    val lines: List<String> = wordsFile.readLines()
+    for (line in lines) {
+        val line = line.split("|")
+        val word = Word(
+            original = line[0],
+            translate = line[1],
+            correctAnswersCount = line.getOrNull(2)?.toIntOrNull() ?: 0
+        )
+        dictionary.add(word)
     }
+    println(dictionary.joinToString("\n"))
 }
