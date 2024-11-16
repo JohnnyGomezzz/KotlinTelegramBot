@@ -42,7 +42,7 @@ fun getLearning(dictionary: MutableList<Word>) {
 
     while (notLearnedList.isNotEmpty()) {
         val questionWords = notLearnedList.shuffled().take(4)
-        val correctAnswer = questionWords.shuffled()[0]
+        val correctAnswer = questionWords[(1..4).random()]
 
         println(
             String.format(
@@ -61,7 +61,7 @@ fun getLearning(dictionary: MutableList<Word>) {
                 questionWords[3].translate,
             )
         )
-        val userAnswer = readln()
+        val userAnswerInput = readln()
     }
 }
 
