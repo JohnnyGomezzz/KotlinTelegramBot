@@ -3,7 +3,7 @@ package org.example
 import java.io.File
 import kotlin.math.roundToInt
 
-private const val NUM_OF_ANSWER_VARIANTS = 4
+private const val NUM_OF_ANSWER_VARIANTS = 5
 
 fun main() {
     val wordsFile = File("words.txt")
