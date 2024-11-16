@@ -25,7 +25,7 @@ fun main() {
         when (choice) {
             "1" -> {
                 println("Вы выбрали \"Учить слова\"")
-                getLearning(dictionary)
+                getLearning(wordsFile, dictionary)
             }
 
             "2" -> {
@@ -39,10 +39,11 @@ fun main() {
     }
 }
 
-fun getLearning(dictionary: MutableList<Word>) {
-
+fun getLearning(wordsFile: File, dictionary: MutableList<Word>) {
     do {
         val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
+        if (notLearnedList.isEmpty()) break
+
         val questionWords = notLearnedList.shuffled().take(NUM_OF_ANSWER_VARIANTS).toMutableList()
         val correctAnswer = questionWords.random()
         if (questionWords.size < NUM_OF_ANSWER_VARIANTS) {
@@ -56,8 +57,28 @@ fun getLearning(dictionary: MutableList<Word>) {
                 "\n-------------------\n0 - выход"
             )
         )
-        val userAnswerInput = readln()
-    } while (notLearnedList.size == 1)
+        val userAnswerInput = readln().toIntOrNull()
+        val correctAnswerId = questionWords.indexOf(correctAnswer) + 1
+
+        when (userAnswerInput) {
+            correctAnswerId -> {
+                println("Правильно!")
+                dictionary.forEach { if (it == correctAnswer) it.correctAnswersCount++ }
+                saveDictionary(wordsFile, dictionary)
+            }
+
+            in (1..NUM_OF_ANSWER_VARIANTS).filter { it != correctAnswerId } -> {
+                println(
+                    "Неправильно! ${correctAnswer.original} - это ${correctAnswer.translate}"
+                )
+            }
+
+            0 -> return
+
+            else -> println("Введите номер ответа или 0 для выхода")
+        }
+    } while (notLearnedList.isNotEmpty())
+    println("Все слова в словаре выучены!")
 }
 
 fun getStatistics(dictionary: MutableList<Word>) {
@@ -90,4 +111,9 @@ fun loadDictionary(wordsFile: File): MutableList<Word> {
         dictionary.add(word)
     }
     return dictionary
+}
+
+fun saveDictionary(wordsFile: File, dictionary: MutableList<Word>) {
+    wordsFile.writeText("")
+    dictionary.forEach { wordsFile.appendText("${it.original}|${it.translate}|${it.correctAnswersCount}\n") }
 }
