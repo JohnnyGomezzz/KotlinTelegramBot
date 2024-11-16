@@ -38,11 +38,12 @@ fun main() {
 }
 
 fun getLearning(dictionary: MutableList<Word>) {
-    val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
+    var notLearnedList: List<Word>
 
-    while (notLearnedList.isNotEmpty()) {
+    do {
+        notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
         val questionWords = notLearnedList.shuffled().take(4)
-        val correctAnswer = questionWords[(1..4).random()]
+        val correctAnswer = questionWords.shuffled()[0]
 
         println(
             String.format(
@@ -62,7 +63,7 @@ fun getLearning(dictionary: MutableList<Word>) {
             )
         )
         val userAnswerInput = readln()
-    }
+    } while (notLearnedList.isNotEmpty())
 }
 
 fun getStatistics(dictionary: MutableList<Word>) {
