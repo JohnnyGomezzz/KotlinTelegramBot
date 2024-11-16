@@ -3,6 +3,8 @@ package org.example
 import java.io.File
 import kotlin.math.roundToInt
 
+private const val NUM_OF_ANSWER_VARIANTS = 4
+
 fun main() {
     val wordsFile = File("words.txt")
     val dictionary: MutableList<Word> = loadDictionary(wordsFile)
@@ -38,12 +40,14 @@ fun main() {
 }
 
 fun getLearning(dictionary: MutableList<Word>) {
-    var notLearnedList: List<Word>
 
     do {
-        notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
-        val questionWords = notLearnedList.shuffled().take(4)
+        val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
+        val questionWords = notLearnedList.shuffled().take(NUM_OF_ANSWER_VARIANTS).toMutableList()
         val correctAnswer = questionWords.shuffled()[0]
+        if (questionWords.size < NUM_OF_ANSWER_VARIANTS) {
+            questionWords += dictionary.take(NUM_OF_ANSWER_VARIANTS - questionWords.size)
+        }
 
         println(
             String.format(
@@ -63,7 +67,7 @@ fun getLearning(dictionary: MutableList<Word>) {
             )
         )
         val userAnswerInput = readln()
-    } while (notLearnedList.isNotEmpty())
+    } while (notLearnedList.size == 1)
 }
 
 fun getStatistics(dictionary: MutableList<Word>) {
