@@ -44,26 +44,16 @@ fun getLearning(dictionary: MutableList<Word>) {
     do {
         val notLearnedList = dictionary.filter { it.correctAnswersCount < 3 }
         val questionWords = notLearnedList.shuffled().take(NUM_OF_ANSWER_VARIANTS).toMutableList()
-        val correctAnswer = questionWords.shuffled()[0]
+        val correctAnswer = questionWords.random()
         if (questionWords.size < NUM_OF_ANSWER_VARIANTS) {
-            questionWords += dictionary.take(NUM_OF_ANSWER_VARIANTS - questionWords.size)
+            questionWords += dictionary.shuffled().take(NUM_OF_ANSWER_VARIANTS - questionWords.size)
         }
 
         println(
-            String.format(
-                """
-                                |
-                                |%s:
-                                |1 - %s
-                                |2 - %s
-                                |3 - %s
-                                |4 - %s
-                            """.trimMargin(),
-                correctAnswer.original,
-                questionWords[0].translate,
-                questionWords[1].translate,
-                questionWords[2].translate,
-                questionWords[3].translate,
+            questionWords.mapIndexed { index, word -> "${index + 1} - ${word.translate}" }.joinToString(
+                "\n",
+                "\n${correctAnswer.original}:\n",
+                "\n-------------------\n0 - выход"
             )
         )
         val userAnswerInput = readln()
