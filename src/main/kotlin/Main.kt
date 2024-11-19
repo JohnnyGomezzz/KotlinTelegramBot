@@ -1,13 +1,11 @@
 package org.example
 
-const val NUM_OF_ANSWER_VARIANTS = 4
-
 fun Question.asConsoleString(): String {
     val variants = this.variants
         .mapIndexed { index, word -> "${index + 1} - ${word.translate}" }
         .joinToString(
-            "\n",
-            "\n${this.correctAnswer.original}:\n",
+            "\n  ",
+            "\n${this.correctAnswer.original}:\n  ",
             "\n-------------------\n0 - выход"
         )
     return variants
@@ -15,7 +13,12 @@ fun Question.asConsoleString(): String {
 
 fun main() {
 
-    val trainer = LearnWordsTrainer()
+    val trainer = try {
+        LearnWordsTrainer(3, 4)
+    } catch (e: Exception) {
+        println("Невозможно загрузить словарь")
+        return
+    }
 
     while (true) {
         println(
@@ -46,7 +49,7 @@ fun main() {
 
                         if (trainer.checkAnswer(userAnswerInput?.minus(1))) {
                             println("Правильно!")
-                        } else if (userAnswerInput in (1..NUM_OF_ANSWER_VARIANTS)
+                        } else if (userAnswerInput in (1..trainer.countOfQuestionWords)
                                 .filter { it != question.variants.indexOf(question.correctAnswer).plus(1) }
                         ) {
                             println(
