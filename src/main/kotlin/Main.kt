@@ -49,14 +49,8 @@ fun main() {
 
                         if (trainer.checkAnswer(userAnswerInput?.minus(1))) {
                             println("Правильно!")
-                        } else if (userAnswerInput in (1..trainer.countOfQuestionWords)
-                                .filter { it != question.variants.indexOf(question.correctAnswer).plus(1) }
-                        ) {
-                            println(
-                                "Неправильно! ${question.correctAnswer.original} - это ${question.correctAnswer.translate}"
-                            )
-                        } else {
-                            println("Введите номер ответа или 0 для выхода")
+                        } else  {
+                            println("Неправильно! ${question.correctAnswer.original} - это ${question.correctAnswer.translate}")
                         }
                     }
                 }
