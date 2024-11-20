@@ -49,7 +49,7 @@ fun main() {
 
                         if (trainer.checkAnswer(userAnswerInput?.minus(1))) {
                             println("Правильно!")
-                        } else  {
+                        } else {
                             println("Неправильно! ${question.correctAnswer.original} - это ${question.correctAnswer.translate}")
                         }
                     }
