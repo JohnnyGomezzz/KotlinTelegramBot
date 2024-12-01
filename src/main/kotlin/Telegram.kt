@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
         println(updates)
 
         updateId = getFromUpdates(updateIdRegex, updates)?.toIntOrNull()?.plus(1) ?: continue
-        val chatId = getFromUpdates(chatIdRegex, updates)?.toIntOrNull() ?: continue
+        val chatId = getFromUpdates(chatIdRegex, updates)?.toLongOrNull() ?: continue
         val receivedText = getFromUpdates(messageTextRegex, updates)
         val receivedData = getFromUpdates(dataRegex, updates)
 

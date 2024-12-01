@@ -8,6 +8,8 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 
 const val TELEGRAM_URL = "https://api.telegram.org/bot"
+const val LEARN_WORDS_CLICKED = "learn_words_clicked"
+const val STATISTICS_CLICKED = "statistics_clicked"
 
 class TelegramBotService(
     private val botToken: String,
@@ -21,7 +23,7 @@ class TelegramBotService(
         return response.body()
     }
 
-    fun sendMessage(chatId: Int, message: String): String {
+    fun sendMessage(chatId: Long, message: String): String {
         val encoded = URLEncoder.encode(message, StandardCharsets.UTF_8)
         val urlSendMessage = "$TELEGRAM_URL$botToken/sendMessage?chat_id=$chatId&text=$encoded"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage)).build()
@@ -29,7 +31,7 @@ class TelegramBotService(
         return response.body()
     }
 
-    fun sendMenu(chatId: Int): String {
+    fun sendMenu(chatId: Long): String {
         val urlSendMessage = "$TELEGRAM_URL$botToken/sendMessage"
         val sendMenuBody = """
             {
@@ -40,11 +42,11 @@ class TelegramBotService(
                         [
                             {
                                 "text": "Учить слова",
-                                "callback_data": "learn_words_pressed"
+                                "callback_data": $LEARN_WORDS_CLICKED
                             },
                             {
                                 "text": "Статистика",
-                                "callback_data": "statistics_pressed"
+                                "callback_data": $STATISTICS_CLICKED
                             }
                         ]
                     ]
