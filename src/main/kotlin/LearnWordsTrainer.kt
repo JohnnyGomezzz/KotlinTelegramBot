@@ -3,6 +3,12 @@ package org.example
 import java.io.File
 import kotlin.math.roundToInt
 
+data class Word(
+    val original: String,
+    val translate: String,
+    var correctAnswersCount: Int = 0,
+)
+
 data class Statistics(
     val learnedWords: Int,
     val totalCount: Int,
@@ -16,7 +22,7 @@ data class Question(
 
 class LearnWordsTrainer(
     private val learnedAnswersCount: Int = 3,
-    val countOfQuestionWords: Int = 4,
+    private val countOfQuestionWords: Int = 4,
 ) {
     private var question: Question? = null
     private val dictionary: MutableList<Word> = loadDictionary()

@@ -2,29 +2,30 @@ package org.example
 
 fun main(args: Array<String>) {
     val service = TelegramBotService(args[0])
+    val trainer = LearnWordsTrainer()
     var updateId = 0
 
     val updateIdRegex: Regex = "\"update_id\":(\\d+),".toRegex()
-    val messageTextRegex: Regex = "\"text\":\"(.+)\"".toRegex()
-    val chatIdRegex: Regex = "\"chat\":.\"id\":(\\d+),".toRegex()
+    val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
+    val chatIdRegex: Regex = "\"chat\":\\{\"id\":(\\d+),".toRegex()
+    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
 
     while (true) {
         Thread.sleep(2000)
         val updates: String = service.getUpdates(updateId)
         println(updates)
 
-        val updateIdMatchResult: MatchResult? = updateIdRegex.find(updates)
-        val updateIdGroups = updateIdMatchResult?.groups
-        updateId = updateIdGroups?.get(1)?.value?.toIntOrNull()?.plus(1) ?: continue
+        updateId = getFromUpdates(updateIdRegex, updates)?.toIntOrNull()?.plus(1) ?: continue
+        val chatId = getFromUpdates(chatIdRegex, updates)?.toLongOrNull() ?: continue
+        val receivedText = getFromUpdates(messageTextRegex, updates)
+        val receivedData = getFromUpdates(dataRegex, updates)
 
-        val chatIdMatchResult: MatchResult? = chatIdRegex.find(updates)
-        val chatIdGroups = chatIdMatchResult?.groups
-        val chatId = chatIdGroups?.get(1)?.value?.toIntOrNull() ?: continue
-
-        val matchResult: MatchResult? = messageTextRegex.find(updates)
-        val groups = matchResult?.groups
-        val receivedText = groups?.get(1)?.value
-
-        if (receivedText.equals("hello", ignoreCase = true)) service.sendMessage(chatId, "Hello!")
+        if (receivedText == "/start".lowercase()) service.sendMenu(chatId)
     }
+}
+
+fun getFromUpdates(dataRegex: Regex, updates: String): String? {
+    val matchResult: MatchResult? = dataRegex.find(updates)
+    val groups = matchResult?.groups
+    return groups?.get(1)?.value
 }
