@@ -21,6 +21,18 @@ fun main(args: Array<String>) {
         val receivedData = getFromUpdates(dataRegex, updates)
 
         if (receivedText == "/start".lowercase()) service.sendMenu(chatId)
+        if (receivedData == STATISTICS_CLICKED) {
+            val statistics = trainer.getStatistics()
+            service.sendMessage(
+                chatId,
+                String.format(
+                    "Выучено %d из %d слов | %d%%",
+                    statistics.learnedWords,
+                    statistics.totalCount,
+                    statistics.percent
+                )
+            )
+        }
     }
 }
 
