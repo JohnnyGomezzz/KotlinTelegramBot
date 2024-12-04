@@ -33,7 +33,18 @@ fun main(args: Array<String>) {
                 )
             )
         }
+        if (receivedData == LEARN_WORDS_CLICKED) checkNextQuestionAndSend(trainer, service, chatId)
     }
+}
+
+fun checkNextQuestionAndSend(trainer: LearnWordsTrainer, service: TelegramBotService, chatId: Long) {
+    val question = trainer.getNextQuestion()
+    if (question == null) {
+        service.sendMessage(
+            chatId,
+            "Все слова в базе выучены!"
+        )
+    } else service.sendQuestion(chatId, question)
 }
 
 fun getFromUpdates(dataRegex: Regex, updates: String): String? {
