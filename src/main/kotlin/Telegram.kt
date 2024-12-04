@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
             )
         }
         if (receivedData == LEARN_WORDS_CLICKED) checkNextQuestionAndSend(trainer, service, chatId)
-        if (receivedData == "back_to_menu") service.sendMenu(chatId)
+        if (receivedData == BACK_TO_MENU) service.sendMenu(chatId)
     }
 }
 

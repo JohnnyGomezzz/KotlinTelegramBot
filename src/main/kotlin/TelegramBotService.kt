@@ -11,6 +11,7 @@ const val TELEGRAM_URL = "https://api.telegram.org/bot"
 const val LEARN_WORDS_CLICKED = "learn_words_clicked"
 const val STATISTICS_CLICKED = "statistics_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+const val BACK_TO_MENU = "back_to_menu"
 
 class TelegramBotService(
     private val botToken: String,
@@ -80,7 +81,7 @@ class TelegramBotService(
                         [
                             {
                                 "text": "Выйти в меню",
-                                "callback_data": "back_to_menu"
+                                "callback_data": "$BACK_TO_MENU"
                             }
                         ]
                     ]
