@@ -76,7 +76,13 @@ class TelegramBotService(
                 "text": "${question.correctAnswer.original}",
                 "reply_markup": {
                     "inline_keyboard": [
-                        $wordButton
+                        $wordButton,
+                        [
+                            {
+                                "text": "Выйти в меню",
+                                "callback_data": "back_to_menu"
+                            }
+                        ]
                     ]
                 }
             }
