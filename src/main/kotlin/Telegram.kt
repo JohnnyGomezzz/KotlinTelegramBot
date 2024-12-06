@@ -35,7 +35,7 @@ fun main(args: Array<String>) {
         }
         if (receivedData == LEARN_WORDS_CLICKED) checkNextQuestionAndSend(trainer, service, chatId)
         if (receivedData == BACK_TO_MENU) service.sendMenu(chatId)
-        if (receivedData != null && receivedData.startsWith(CALLBACK_DATA_ANSWER_PREFIX)) {
+        if (receivedData?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
             val dataIndex = receivedData.substringAfter("_").toInt()
             if (trainer.checkAnswer(dataIndex)) {
                 service.sendMessage(
