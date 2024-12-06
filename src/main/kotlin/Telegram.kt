@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
 
     val updateIdRegex: Regex = "\"update_id\":(\\d+),".toRegex()
     val messageTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
-    val chatIdRegex: Regex = "\"chat\":\\{\"id\":(\\d+),".toRegex()
+    val chatIdRegex: Regex = "\"chat\":\\{\"id\":(-*\\d+),".toRegex()
     val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
 
     while (true) {
