@@ -35,6 +35,20 @@ fun main(args: Array<String>) {
         }
         if (receivedData == LEARN_WORDS_CLICKED) checkNextQuestionAndSend(trainer, service, chatId)
         if (receivedData == BACK_TO_MENU) service.sendMenu(chatId)
+        if (receivedData?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
+            val dataIndex = receivedData.substringAfter("_").toInt()
+            if (trainer.checkAnswer(dataIndex)) {
+                service.sendMessage(
+                    chatId,
+                    "Правильно!")
+            } else {
+                service.sendMessage(
+                    chatId,
+                    "Неправильно! ${trainer.question?.correctAnswer?.original} - это ${trainer.question?.correctAnswer?.translate}"
+                )
+            }
+            checkNextQuestionAndSend(trainer, service, chatId)
+        }
     }
 }
 
@@ -45,6 +59,7 @@ fun checkNextQuestionAndSend(trainer: LearnWordsTrainer, service: TelegramBotSer
             chatId,
             "Все слова в базе выучены!"
         )
+        service.sendMenu(chatId)
     } else service.sendQuestion(chatId, question)
 }
 
