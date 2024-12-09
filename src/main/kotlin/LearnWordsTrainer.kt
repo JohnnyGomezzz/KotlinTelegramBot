@@ -1,8 +1,10 @@
 package org.example
 
+import kotlinx.serialization.Serializable
 import java.io.File
 import kotlin.math.roundToInt
 
+@Serializable
 data class Word(
     val original: String,
     val translate: String,
