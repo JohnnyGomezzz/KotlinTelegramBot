@@ -48,7 +48,6 @@ fun main(args: Array<String>) {
 
     while (true) {
         Thread.sleep(2000)
-
         val updates = service.getUpdates(lastUpdateId).result
         if (updates.isEmpty()) continue
         val sortedUpdates = updates.sortedBy { it.updateId }
