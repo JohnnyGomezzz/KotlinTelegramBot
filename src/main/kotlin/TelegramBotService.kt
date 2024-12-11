@@ -50,11 +50,14 @@ class TelegramBotService(
         ignoreUnknownKeys = true
     }
 
-    fun getUpdates(updateId: Long): String {
+    fun getUpdates(updateId: Long): Response {
         val urlGetUpdates = "$TELEGRAM_URL$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+
+        val responseString: String = response.body()
+        println(responseString)
+        return json.decodeFromString(responseString)
     }
 
     private fun sendMessage(chatId: Long, message: String): String {

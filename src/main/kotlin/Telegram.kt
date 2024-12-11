@@ -2,7 +2,6 @@ package org.example
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class Update(
@@ -45,15 +44,12 @@ data class Chat(
 fun main(args: Array<String>) {
     val service = TelegramBotService(args[0])
     var lastUpdateId = 0L
-    val json = Json { ignoreUnknownKeys = true }
     val trainers = HashMap<Long, LearnWordsTrainer>()
 
     while (true) {
         Thread.sleep(2000)
-        val responseString: String = service.getUpdates(lastUpdateId)
-        println(responseString)
-        val response: Response = json.decodeFromString(responseString)
-        val updates = response.result
+
+        val updates = service.getUpdates(lastUpdateId).result
         if (updates.isEmpty()) continue
         val sortedUpdates = updates.sortedBy { it.updateId }
         sortedUpdates.forEach { service.handleUpdate(it, trainers) }
