@@ -16,6 +16,7 @@ const val LEARN_WORDS_CLICKED = "learn_words_clicked"
 const val STATISTICS_CLICKED = "statistics_clicked"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 const val BACK_TO_MENU = "back_to_menu"
+const val RESET_CLICKED = "reset_clicked"
 
 @Serializable
 data class SendMessageRequest(
@@ -45,7 +46,6 @@ class TelegramBotService(
     private val botToken: String,
 ) {
     private val client: HttpClient = HttpClient.newBuilder().build()
-
     private val json = Json {
         ignoreUnknownKeys = true
     }
@@ -60,7 +60,7 @@ class TelegramBotService(
         return json.decodeFromString(responseString)
     }
 
-    fun sendMessage(chatId: Long, message: String): String {
+    private fun sendMessage(chatId: Long, message: String): String {
         val encoded = URLEncoder.encode(message, StandardCharsets.UTF_8)
         val urlSendMessage = "$TELEGRAM_URL$botToken/sendMessage?chat_id=$chatId&text=$encoded"
 
@@ -75,11 +75,11 @@ class TelegramBotService(
         return response.body()
     }
 
-    fun sendMenu(chatId: Long): String {
+    private fun sendMenu(chatId: Long): String {
         val urlSendMessage = "$TELEGRAM_URL$botToken/sendMessage"
 
         val requestBody = SendMessageRequest(
-            chatId, "Основное меню", ReplyMarkup(
+            chatId, "Главное меню", ReplyMarkup(
                 listOf(
                     listOf(
                         InlineKeyboard(
@@ -89,6 +89,12 @@ class TelegramBotService(
                         InlineKeyboard(
                             text = "Статистика",
                             callbackData = STATISTICS_CLICKED,
+                        ),
+                    ),
+                    listOf(
+                        InlineKeyboard(
+                            text = "Сбросить прогресс",
+                            callbackData = RESET_CLICKED,
                         ),
                     )
                 )
@@ -104,9 +110,8 @@ class TelegramBotService(
         return response.body()
     }
 
-    fun sendQuestion(chatId: Long, question: Question): String {
+    private fun sendQuestion(chatId: Long, question: Question): String {
         val urlSendMessage = "$TELEGRAM_URL$botToken/sendMessage"
-
         val requestBody = SendMessageRequest(
             chatId, question.correctAnswer.original, ReplyMarkup(
                 (question.variants.mapIndexed { index, word ->
@@ -128,5 +133,64 @@ class TelegramBotService(
             .build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
+    }
+
+    fun handleUpdate(update: Update, trainers: HashMap<Long, LearnWordsTrainer>) {
+        val chatId = update.message?.chat?.id ?: update.callbackQuery?.message?.chat?.id ?: return
+        val receivedText = update.message?.text
+        val receivedData = update.callbackQuery?.data
+
+        val trainer = trainers.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt")}
+
+        if (receivedText == "/start".lowercase()) sendMenu(chatId)
+        if (receivedData == STATISTICS_CLICKED) {
+            val statistics = trainer.getStatistics()
+            sendMessage(
+                chatId,
+                String.format(
+                    "Выучено %d из %d слов | %d%%",
+                    statistics.learnedWords,
+                    statistics.totalCount,
+                    statistics.percent
+                )
+            )
+            sendMenu(chatId)
+        }
+        if (receivedData == LEARN_WORDS_CLICKED) checkNextQuestionAndSend(trainer, chatId)
+        if (receivedData == BACK_TO_MENU) sendMenu(chatId)
+        if (receivedData?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true) {
+            val dataIndex = receivedData.substringAfter("_").toInt()
+            if (trainer.checkAnswer(dataIndex)) {
+                sendMessage(
+                    chatId,
+                    "Правильно!"
+                )
+            } else {
+                sendMessage(
+                    chatId,
+                    "Неправильно! ${trainer.question?.correctAnswer?.original} - это ${trainer.question?.correctAnswer?.translate}"
+                )
+            }
+            checkNextQuestionAndSend(trainer, chatId)
+        }
+        if (receivedData == RESET_CLICKED) {
+            trainer.resetProgress()
+            sendMessage(
+                chatId,
+                "Прогресс сброшен"
+            )
+            sendMenu(chatId)
+        }
+    }
+
+    private fun checkNextQuestionAndSend(trainer: LearnWordsTrainer, chatId: Long) {
+        val question = trainer.getNextQuestion()
+        if (question == null) {
+            sendMessage(
+                chatId,
+                "Все слова в базе выучены!"
+            )
+            sendMenu(chatId)
+        } else sendQuestion(chatId, question)
     }
 }
