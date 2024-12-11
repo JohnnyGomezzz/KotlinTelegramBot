@@ -2,7 +2,6 @@ package org.example
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class Update(
@@ -47,16 +46,9 @@ fun main(args: Array<String>) {
     val trainer = LearnWordsTrainer()
     var lastUpdateId = 0L
 
-    val json = Json {
-        ignoreUnknownKeys = true
-    }
-
     while (true) {
         Thread.sleep(2000)
-        val responseString: String = service.getUpdates(lastUpdateId)
-        println(responseString)
-        val response: Response = json.decodeFromString(responseString)
-        val updates = response.result
+        val updates = service.getUpdates(lastUpdateId).result
         val firstUpdate = updates.firstOrNull() ?: continue
         val updateId = firstUpdate.updateId
         lastUpdateId = updateId + 1
