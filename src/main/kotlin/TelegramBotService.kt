@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -53,7 +54,11 @@ class TelegramBotService(
     fun getUpdates(updateId: Long): Response {
         val urlGetUpdates = "$TELEGRAM_URL$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
-        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+        val response: HttpResponse<String> = try {
+            client.send(request, HttpResponse.BodyHandlers.ofString())
+        } catch (e: IOException) {
+            return Response(listOf(Update(0L, null, null)))
+        }
 
         val responseString: String = response.body()
         println(responseString)
@@ -140,7 +145,7 @@ class TelegramBotService(
         val receivedText = update.message?.text
         val receivedData = update.callbackQuery?.data
 
-        val trainer = trainers.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt")}
+        val trainer = trainers.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt") }
 
         if (receivedText == "/start".lowercase()) sendMenu(chatId)
         if (receivedData == STATISTICS_CLICKED) {

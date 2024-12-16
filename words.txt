@@ -1,9 +1,9 @@
-hello|привет|1
+hello|привет|0
 dog|собака|0
 cat|кошка|0
 smile|улыбка|0
 train|поезд|0
-car|автомобиль|1
+car|автомобиль|0
 ship|корабль|0
 plane|самолёт|0
 hat|шляпа|0
@@ -11,7 +11,7 @@ pen|ручка|0
 pencil|карандаш|0
 ruler|линейка|0
 mouse|мышь|0
-microphone|микрофон|1
+microphone|микрофон|0
 lamp|лампа|0
 plant|растение|0
 table|стол|0
