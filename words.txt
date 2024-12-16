@@ -110,3 +110,4 @@ princess|принцесса|0
 knight|рыцарь|0
 tower|башня|0
 statue|статуя|0
+baby|ребёнок|0
