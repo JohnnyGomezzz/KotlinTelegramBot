@@ -39,6 +39,8 @@ data class CallbackQuery(
 data class Chat(
     @SerialName("id")
     val id: Long,
+    @SerialName("username")
+    val userName: String? = null,
 )
 
 fun main(args: Array<String>) {

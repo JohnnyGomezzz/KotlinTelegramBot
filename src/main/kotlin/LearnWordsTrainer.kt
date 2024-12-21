@@ -22,29 +22,27 @@ data class Question(
 )
 
 class LearnWordsTrainer(
-    fileName: String,
-    private val learnedAnswersCount: Int = 3,
+    chatId: Long,
     private val countOfQuestionWords: Int = 4,
 ) {
     var question: Question? = null
-    private val fileUserDictionary = FileUserDictionary(fileName)
-    private val dictionary = fileUserDictionary.loadDictionary()
+    private val dictionary = DatabaseUserDictionary(chatId)
 
     fun getStatistics(): Statistics {
 
-        val learnedWords = dictionary.filter { it.correctAnswersCount >= learnedAnswersCount }.size
-        val totalCount = dictionary.size
+        val learnedWords = dictionary.getLearnedWords().size
+        val totalCount = dictionary.getSize()
         val percent = (learnedWords.toDouble() / totalCount.toDouble() * 100.0).roundToInt()
 
         return Statistics(learnedWords, totalCount, percent)
     }
 
     fun getNextQuestion(): Question? {
-        val notLearnedList = dictionary.filter { it.correctAnswersCount < learnedAnswersCount }
+        val notLearnedList = dictionary.getUnlearnedWords()
         if (notLearnedList.isEmpty()) return null
 
         val questionWords = if (notLearnedList.size < countOfQuestionWords) {
-            val learnedList = dictionary.filter { it.correctAnswersCount >= learnedAnswersCount }
+            val learnedList = dictionary.getLearnedWords()
             notLearnedList.shuffled().take(countOfQuestionWords) + learnedList.shuffled()
                 .take(countOfQuestionWords - notLearnedList.size)
         } else {
@@ -64,7 +62,7 @@ class LearnWordsTrainer(
         return question?.let {
             val correctAnswerId = it.variants.indexOf(it.correctAnswer)
             if (correctAnswerId == userAnswerId) {
-                fileUserDictionary.setCorrectAnswersCount(it.correctAnswer.original, it.correctAnswer.correctAnswersCount++)
+                dictionary.setCorrectAnswersCount(it.correctAnswer.original, it.correctAnswer.correctAnswersCount.plus(1))
                 true
             } else false
         } ?: false
