@@ -15,8 +15,7 @@ fun main() {
 
     val trainer = try {
         LearnWordsTrainer(
-            fileName = DEFAULT_FILE_NAME,
-            learnedAnswersCount = 3,
+            chatId = 0L,
             countOfQuestionWords = 4,
         )
     } catch (e: Exception) {

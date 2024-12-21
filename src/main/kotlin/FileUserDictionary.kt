@@ -3,11 +3,9 @@ package org.example
 import java.io.File
 
 const val DEFAULT_FILE_NAME = "words.txt"
-const val DEFAULT_LEARNING_THRESHOLD = 3
 
 class FileUserDictionary(
     private val fileName: String = DEFAULT_FILE_NAME,
-    private val learningThreshold: Int = DEFAULT_LEARNING_THRESHOLD,
 ) : IUserDictionary {
 
     private val dictionary = try {
@@ -16,7 +14,7 @@ class FileUserDictionary(
         throw IllegalArgumentException("Некорректный файл")
     }
 
-    fun loadDictionary(): MutableList<Word> {
+    private fun loadDictionary(): MutableList<Word> {
         try {
             val dictionary: MutableList<Word> = mutableListOf()
             val wordsFile = File(fileName)

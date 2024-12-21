@@ -141,11 +141,17 @@ class TelegramBotService(
     }
 
     fun handleUpdate(update: Update, trainers: HashMap<Long, LearnWordsTrainer>) {
+        val userName = update.message?.chat?.userName
         val chatId = update.message?.chat?.id ?: update.callbackQuery?.message?.chat?.id ?: return
         val receivedText = update.message?.text
         val receivedData = update.callbackQuery?.data
 
-        val trainer = trainers.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt") }
+        val dictionary = DatabaseUserDictionary(chatId)
+        if (userName != null) {
+            dictionary.loadDictionary(userName)
+        }
+
+        val trainer = trainers.getOrPut(chatId) { LearnWordsTrainer(chatId) }
 
         if (receivedText == "/start".lowercase()) sendMenu(chatId)
         if (receivedData == STATISTICS_CLICKED) {
