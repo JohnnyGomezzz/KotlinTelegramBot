@@ -40,9 +40,9 @@ class DatabaseUserDictionary(
                 )
                 statement.executeUpdate(
                     "insert or ignore into users(username, created_at, chat_id)\n" +
-                                "VALUES('$userName', '$currentDate', $chatId);"
+                            "VALUES('$userName', '$currentDate', $chatId);"
                 )
-                for (i in 1..getSize()) {
+                for (i in 0..getSize()) {
                     statement.executeUpdate(
                         "insert into user_answers (user_id, word_id, updated_at)\n" +
                                 "VALUES(" +
@@ -97,7 +97,7 @@ class DatabaseUserDictionary(
                 val statement = connection.createStatement()
                 val rs: ResultSet = statement.executeQuery(
                     """
-                    SELECT text, translate from words
+                    SELECT words.text, words.translate, user_answers.correct_answer_count from words
                     JOIN user_answers
                     on words.id = user_answers.word_id
                     where correct_answer_count >= $learningThreshold and user_id = 
@@ -105,7 +105,13 @@ class DatabaseUserDictionary(
                 """.trimMargin()
                 )
                 while (rs.next()) {
-                    learnedWords.add(Word(rs.getString("text"), rs.getString("translate")))
+                    learnedWords.add(
+                        Word(
+                            rs.getString("text"),
+                            rs.getString("translate"),
+                            rs.getInt("correct_answer_count")
+                        )
+                    )
                 }
             }
         return learnedWords
@@ -118,7 +124,7 @@ class DatabaseUserDictionary(
                 val statement = connection.createStatement()
                 val rs: ResultSet = statement.executeQuery(
                     """
-                    SELECT text, translate from words
+                    SELECT words.text, words.translate, user_answers.correct_answer_count from words
                     JOIN user_answers
                     on words.id = user_answers.word_id
                     where correct_answer_count < $learningThreshold and user_id = 
@@ -126,7 +132,13 @@ class DatabaseUserDictionary(
                 """.trimMargin()
                 )
                 while (rs.next()) {
-                    unlearnedWords.add(Word(rs.getString("text"), rs.getString("translate")))
+                    unlearnedWords.add(
+                        Word(
+                            rs.getString("text"),
+                            rs.getString("translate"),
+                            rs.getInt("correct_answer_count")
+                        )
+                    )
                 }
             }
         return unlearnedWords
@@ -157,8 +169,10 @@ class DatabaseUserDictionary(
                 val statement = connection.createStatement()
                 statement.executeUpdate(
                     """
-                    DELETE FROM user_answers
-                    WHERE user_id = 2;
+                    UPDATE user_answers
+                    SET correct_answer_count = 0
+                    WHERE user_id = (
+                    SELECT id FROM users WHERE chat_id = $chatId);
             """.trimIndent()
                 )
             }
