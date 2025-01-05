@@ -185,7 +185,7 @@ class TelegramBotService(
             checkNextQuestionAndSend(trainer, chatId)
         }
         if (receivedData == RESET_CLICKED) {
-            FileUserDictionary().resetProgress()
+            dictionary.resetProgress()
             sendMessage(
                 chatId,
                 "Прогресс сброшен"
