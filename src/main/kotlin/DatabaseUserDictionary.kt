@@ -39,15 +39,25 @@ class DatabaseUserDictionary(
             """.trimIndent()
                 )
                 statement.executeUpdate(
-                    "insert or ignore into users(username, created_at, chat_id)\n" +
-                            "VALUES('$userName', '$currentDate', $chatId);"
+                    """
+                        INSERT OR IGNORE INTO users(username, created_at, chat_id)
+                        VALUES(
+                        '$userName', 
+                        '$currentDate', 
+                        $chatId
+                        );
+                    """.trimIndent()
                 )
                 for (i in 0..getSize()) {
                     statement.executeUpdate(
-                        "insert into user_answers (user_id, word_id, updated_at)\n" +
-                                "VALUES(" +
-                                "(SELECT id FROM users WHERE chat_id = $chatId), " +
-                                i + ", '$currentDate');"
+                        """
+                            INSERT INTO user_answers (user_id, word_id, updated_at)
+                            VALUES(
+                            (SELECT id FROM users WHERE chat_id = $chatId),
+                            i,
+                            '$currentDate'
+                            );
+                        """.trimIndent()
                     )
                 }
             }
@@ -60,10 +70,10 @@ class DatabaseUserDictionary(
                 val statement = connection.createStatement()
                 val rs: ResultSet = statement.executeQuery(
                     """
-                    |SELECT count(correct_answer_count)
-                    |from user_answers
-                    |where correct_answer_count >= 3;
-                """.trimMargin()
+                    SELECT count(correct_answer_count)
+                    FROM user_answers
+                    WHERE correct_answer_count >= 3;
+                """.trimIndent()
                 )
                 while (rs.next()) {
                     counter = rs.getInt("count(correct_answer_count)")
@@ -79,9 +89,9 @@ class DatabaseUserDictionary(
                 val statement = connection.createStatement()
                 val rs: ResultSet = statement.executeQuery(
                     """
-                    |SELECT count(*)
-                    |from words;
-                """.trimMargin()
+                    SELECT count(*)
+                    FROM words;
+                """.trimIndent()
                 )
                 while (rs.next()) {
                     counter = rs.getInt("count(*)")
@@ -99,10 +109,10 @@ class DatabaseUserDictionary(
                     """
                     SELECT words.text, words.translate, user_answers.correct_answer_count from words
                     JOIN user_answers
-                    on words.id = user_answers.word_id
-                    where correct_answer_count >= $learningThreshold and user_id = 
+                    ON words.id = user_answers.word_id
+                    WHERE correct_answer_count >= $learningThreshold and user_id = 
                     (SELECT id from users WHERE chat_id = $chatId);
-                """.trimMargin()
+                """.trimIndent()
                 )
                 while (rs.next()) {
                     learnedWords.add(
@@ -126,10 +136,10 @@ class DatabaseUserDictionary(
                     """
                     SELECT words.text, words.translate, user_answers.correct_answer_count from words
                     JOIN user_answers
-                    on words.id = user_answers.word_id
+                    ON words.id = user_answers.word_id
                     where correct_answer_count < $learningThreshold and user_id = 
                     (SELECT id from users WHERE chat_id = $chatId);
-                """.trimMargin()
+                """.trimIndent()
                 )
                 while (rs.next()) {
                     unlearnedWords.add(
@@ -153,7 +163,8 @@ class DatabaseUserDictionary(
                     """
                     UPDATE user_answers
                         SET correct_answer_count = $correctAnswersCount, updated_at = '$currentDate'
-                        WHERE word_id = (SELECT id FROM words
+                        WHERE word_id = (
+                        SELECT id FROM words
                         WHERE text = '$word' AND user_id = (
                         SELECT id FROM users
                         WHERE chat_id = $chatId));
