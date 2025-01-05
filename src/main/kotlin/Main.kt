@@ -1,21 +1,42 @@
 package org.example
 
+import javax.naming.InvalidNameException
+
 fun Question.asConsoleString(): String {
-    val variants = this.variants
+    if (variants.isEmpty()) {
+        throw NullPointerException("Список вариантов пуст!")
+    }
+    if (variants.contains(variants.find {
+            it.original.contains("[^\\w\\s]+".toRegex()) ||
+            it.translate.contains("[^а-яА-ЯёЁ\\s]+".toRegex())
+        })) {
+        throw InvalidNameException("Одно слово или несколько слов содержат недопустимые символы!")
+    }
+    if (variants.contains(variants.find {
+            it.original.contains("[a-zA-Zа-яА-ЯёЁ]".toRegex()).not() ||
+                    it.translate.contains("[a-zA-Zа-яА-ЯёЁ]".toRegex()).not()
+        })) {
+        throw InvalidNameException("Одно слово или несколько слов не содержат буквенных символов!")
+    }
+    if (variants.size > 10) {
+        variants = variants.take(10)
+    }
+
+    val printVariants = variants
         .mapIndexed { index, word -> "${index + 1} - ${word.translate}" }
         .joinToString(
             "\n  ",
-            "\n${this.correctAnswer.original}:\n  ",
+            "\n${correctAnswer.original}:\n  ",
             "\n-------------------\n0 - выход"
         )
-    return variants
+    return printVariants
 }
 
 fun main() {
 
     val trainer = try {
         LearnWordsTrainer(
-            chatId = 0L,
+            chatId = 1332884769,
             countOfQuestionWords = 4,
         )
     } catch (e: Exception) {
