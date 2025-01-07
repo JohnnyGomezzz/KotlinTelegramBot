@@ -8,18 +8,11 @@ import kotlin.test.assertEquals
 
 class AsConsoleStringTest {
 
+    private val mock = AsConsoleStringMock()
+
     @Test
     fun test4Variants() {
-        val question = Question(
-            variants = mutableListOf(
-                Word("cat", "кошка"),
-                Word("deer", "олень"),
-                Word("dog", "собака"),
-                Word("plane", "самолёт"),
-            ),
-            correctAnswer = Word("dog", "собака")
-        )
-        val result = question.asConsoleString()
+
         assertEquals(
             """
         |
@@ -31,7 +24,7 @@ class AsConsoleStringTest {
         |-------------------
         |0 - выход
     """.trimMargin(),
-            result
+            mock.test4VariantsQuestion.asConsoleString()
         )
     }
 
