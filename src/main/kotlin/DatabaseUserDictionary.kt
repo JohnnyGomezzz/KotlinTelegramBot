@@ -54,7 +54,7 @@ class DatabaseUserDictionary(
                             INSERT INTO user_answers (user_id, word_id, updated_at)
                             VALUES(
                             (SELECT id FROM users WHERE chat_id = $chatId),
-                            i,
+                            $i,
                             '$currentDate'
                             );
                         """.trimIndent()
